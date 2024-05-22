@@ -1,0 +1,339 @@
+     1                                  global main
+     2                                  extern fopen
+     3                                  extern fclose
+     4                                  extern fread
+     5                                  extern printf
+     6                                  extern gets
+     7                                  extern sscanf
+     8                                  
+     9                                  
+    10                                  section .data
+    11                                  
+    12 00000000 00000000<rep 90h>       	matriz times 144 dd 0                            ; Matriz de 12x12 = 144 departamentos. Binario de 4 bytes = double
+    13                                  
+    14 00000240 4C69737461646F2064-     	msjPrintfListado dw "Listado de pisos donde el departamento tiene un valor menor al ingresado",10,0
+    14 00000249 65207069736F732064-
+    14 00000252 6F6E646520656C2064-
+    14 0000025B 6570617274616D656E-
+    14 00000264 746F207469656E6520-
+    14 0000026D 756E2076616C6F7220-
+    14 00000276 6D656E6F7220616C20-
+    14 0000027F 696E6772657361646F-
+    14 00000288 0A000000           
+    15                                  
+    16 0000028C 5069736F3A202569        	msjMostrarPiso dw "Piso: %i"
+    17                                  
+    18 00000294 506F72206661766F72-     	msjIngresoPrecio dw "Por favor ingrese un valor que represente el precio", 0
+    18 0000029D 20696E677265736520-
+    18 000002A6 756E2076616C6F7220-
+    18 000002AF 717565207265707265-
+    18 000002B8 73656E746520656C20-
+    18 000002C1 70726563696F000000 
+    19                                  
+    20 000002CA 506F72206661766F72-     	msjIngresoDepto  dw "Por favor ingrese un valor que represente un departamento", 0
+    20 000002D3 20696E677265736520-
+    20 000002DC 756E2076616C6F7220-
+    20 000002E5 717565207265707265-
+    20 000002EE 73656E746520756E20-
+    20 000002F7 646570617274616D65-
+    20 00000300 6E746F000000       
+    21                                  
+    22 00000306 4875626F20756E2065-     	msjErrorArchivo dw "Hubo un error", 0
+    22 0000030F 72726F72000000     
+    23                                  
+    24 00000316 50524543494F532E44-     	nombreArchivo db "PRECIOS.DAT",0
+    24 0000031F 415400             
+    25 00000322 726200                  	mode db "rb",0
+    26                                  
+    27                                  
+    28                                  	registro times 0 db ""
+    29                                  		piso dw ""
+    30 00000325 00                      		dpto db 0
+    31 00000326 00000000                		precio dd 0
+    32                                  
+    33                                  	esValid db ""
+    34                                  
+    35 0000032A 2569                    	formatConversion dw "%i"
+    36                                  
+    37 0000032C 00000000                	elemento dd 0
+    38                                  
+    39 00000330 0000000000000000        	fileHandle dq 0
+    40                                  
+    41 00000338 01000000                	pisoInicial dd 1
+    42                                  
+    43                                  section .bss
+    44                                  
+    45 00000000 ????????                	pisoIng    resd 1
+    46                                  
+    47 00000004 <res Ah>                	buffer    resb 10
+    48                                  
+    49 0000000E ????????                	dptoIng   resb 4
+    50                                  
+    51 00000012 ????????????????        	precioIng resq 1
+    52                                  
+    53                                  section .text
+    54                                  
+    55                                  main:
+    56                                  
+    57 00000000 E816000000              	call abrirArch
+    58 00000005 48833C25[30030000]-     	cmp qword[fileHandle], 0
+    58 0000000D 00                 
+    59 0000000E 7E35                    	jle error
+    60                                  
+    61 00000010 E846000000              	call leerArch
+    62                                  
+    63 00000015 E846010000              	call ingresoUsuario
+    64                                  
+    65                                  
+    66                                  
+    67                                  endProg:
+    68                                  
+    69 0000001A C3                      	ret
+    70                                  
+    71                                  
+    72                                  
+    73                                  abrirArch:
+    74                                  
+    75                                  
+    76 0000001B 48BF-                   	mov rdi, nombreArchivo                  ; Parametro 1: Nombre del archivo a abrir
+    76 0000001D [1603000000000000] 
+    77 00000025 48BE-                   	mov rsi, mode                           ; Parametro 2: Modo de apertura
+    77 00000027 [2203000000000000] 
+    78 0000002F 4883EC08                	sub rsp, 8                              ; resto 8 al rsp dado que estoy trabajando en linux
+    79 00000033 E8(00000000)            	call fopen                              ; Llamado a la funcion de C fopen
+    80 00000038 4883C408                	add rsp, 8
+    81                                  
+    82 0000003C 48890425[30030000]      	mov qword[fileHandle], rax
+    83                                  
+    84 00000044 C3                      	ret
+    85                                  
+    86                                  
+    87                                  error:
+    88                                  
+    89 00000045 B800000000              	mov rax, 0
+    90 0000004A 48BF-                   	mov rdi, msjErrorArchivo				; Parametro 1: Mensaje a imprimir
+    90 0000004C [0603000000000000] 
+    91 00000054 E8(00000000)            	call printf                             ; Llamado a la funcion de C printf
+    92                                  
+    93 00000059 EBBF                    	jmp endProg
+    94                                  
+    95                                  
+    96                                  
+    97                                  
+    98                                  leerArch:
+    99                                  
+   100                                  
+   101                                  leerRegistro:
+   102                                  
+   103 0000005B 48BF-                   	mov rdi, registro                     ; Parametro 1: Donde voy a copiar los datos
+   103 0000005D [2503000000000000] 
+   104 00000065 BE07000000              	mov rsi, 7                            ; Parametro 2: Longitud del registro. word = 2 bytes + byte = 1 byte + double = 4 bytes = 7
+   105 0000006A BA01000000              	mov rdx, 1                            ; Parametro 3: Cantidad de registros a leerArch
+   106 0000006F 488B0C25[30030000]      	mov rcx, qword[fileHandle]            ; Parametro 4: Handle del archivo
+   107 00000077 4883EC08                	sub rsp, 8
+   108 0000007B E8(00000000)            	call fread                            ; Llamado a la funcion de C fread
+   109 00000080 4883C408                	add rsp, 8
+   110                                  
+   111 00000084 4883F800                	cmp rax, 0
+   112 00000088 EB16                    	jmp eof
+   113                                  
+   114 0000008A E827000000              	call VALREG
+   115                                  
+   116 0000008F 803C25[2A030000]4E      	cmp byte[esValid], "N"
+   117 00000097 74C2                    	je leerRegistro
+   118                                  
+   119 00000099 E894000000              	call actualizarMatriz				; Actualizo la matriz con los datos obtenidos
+   120                                  
+   121 0000009E EBBB                    	jmp leerRegistro
+   122                                  
+   123                                  
+   124                                  eof:
+   125                                  
+   126 000000A0 488B3C25[30030000]      	mov rdi, qword[fileHandle]         ; Parametro 1: FileHandle del archivo a cerrar
+   127 000000A8 4883EC08                	sub rsp, 8
+   128 000000AC E8(00000000)            	call fclose
+   129 000000B1 4883C408                	add rsp, 8
+   130                                  
+   131 000000B5 C3                      	ret
+   132                                  
+   133                                  
+   134                                  VALREG:
+   135                                  
+   136                                  
+   137 000000B6 48BF-                   	mov rdi, piso                       ; Parametro 1: Donde estan los datos a convertir
+   137 000000B8 [2503000000000000] 
+   138 000000C0 48BE-                   	mov rsi, formatConversion           ; Parametro 2: El formato de la conversion
+   138 000000C2 [2A03000000000000] 
+   139 000000CA 48BA-                   	mov rdx, pisoIng					; Parametro 3: Donde guardo los datos convertidos
+   139 000000CC [0000000000000000] 
+   140 000000D4 4883EC08                	sub rsp, 8
+   141 000000D8 E8(00000000)            	call sscanf                         ; Llamado a la funcion de C sscanf
+   142 000000DD 4883C408                	add rsp, 8
+   143                                  
+   144 000000E1 4883F801                	cmp rax, 1
+   145 000000E5 0F8C5AFFFFFF            	jl error
+   146                                  
+   147 000000EB 833C25[00000000]01      	cmp dword[pisoIng], 1
+   148 000000F3 7C32                    	jl  registroInvalido
+   149                                  
+   150 000000F5 833C25[00000000]0C      	cmp dword[pisoIng], 12
+   151 000000FD 7F28                    	jg  registroInvalido
+   152                                  										; Tanto el piso como el departamento tienen que ser valores entre 1 y 12.
+   153                                  
+   154 000000FF 803C25[25030000]01      	cmp byte[dpto], 1
+   155 00000107 7C1E                    	jl registroInvalido
+   156                                  
+   157 00000109 803C25[25030000]0C      	cmp byte[dpto], 12
+   158 00000111 7F14                    	jg registroInvalido
+   159                                  
+   160                                  
+   161 00000113 833C25[26030000]00      	cmp dword[precio], 0
+   162 0000011B 7F0A                    	jg registroInvalido
+   163                                  
+   164                                  
+   165                                  										;Si paso todas las validaciones, tengo un registro valido
+   166                                  
+   167 0000011D C60425[2A030000]53      	mov byte[esValid], "S"
+   168 00000125 EB0A                    	jmp finVALREG
+   169                                  
+   170                                  registroInvalido:
+   171                                  
+   172 00000127 C60425[2A030000]4E      	mov byte[esValid], "N"
+   173 0000012F EB00                    	jmp finVALREG
+   174                                  
+   175                                  
+   176                                  finVALREG:
+   177                                  
+   178 00000131 C3                      	ret
+   179                                  
+   180                                  
+   181                                  actualizarMatriz:
+   182                                  
+   183 00000132 8B0425[00000000]        	mov eax, dword[pisoIng]
+   184 00000139 FFC8                    	dec eax                           ; RAX = FILA - 1
+   185                                  
+   186 0000013B 6BC004                  	imul eax, 4                       ; Multiplico por la longitud del elemento
+   187 0000013E 6BC00C                  	imul eax, 12                      ; Multiplico por la cantidad de columnas
+   188                                  
+   189 00000141 89C3                    	mov ebx, eax                      ; rbx = desplazamiento de FILA
+   190                                  
+   191 00000143 8B0425[25030000]        	mov eax, dword[dpto]
+   192 0000014A FFC8                    	dec eax                           ; RAX = COLUMNA - 1
+   193                                  
+   194 0000014C 6BC004                  	imul eax, 4                       ; Multiplico por la longitud del elemento
+   195                                  
+   196 0000014F 01C3                    	add ebx, eax                      ; rbx = desplazamiento total
+   197                                  
+   198 00000151 8B0425[26030000]        	mov eax, dword[precio]			  ; Almaceno el precio (double 4 bytes x 8 bits = 32 bits) en el eax
+   199 00000158 678983[00000000]        	mov dword[matriz + ebx], eax      ; Guardo en la matriz el precio
+   200                                  
+   201                                  
+   202 0000015F C3                      	ret                               ; Termine de actualizar el precio del dpto indicado en el piso indicado
+   203                                  
+   204                                  
+   205                                  
+   206                                  ingresoUsuario:
+   207                                  
+   208                                  
+   209 00000160 48BF-                   	mov rdi, msjIngresoDepto         ; Parametro 1: Mensaje a imprimir
+   209 00000162 [CA02000000000000] 
+   210 0000016A 4883EC08                	sub rsp, 8
+   211 0000016E E8(00000000)            	call printf
+   212 00000173 4883C408                	add rsp, 8
+   213                                  
+   214 00000177 48BF-                   	mov rdi, buffer					; Parametro 1: Donde voy a guardar lo ingresado
+   214 00000179 [0400000000000000] 
+   215 00000181 4883EC08                	sub rsp, 8
+   216 00000185 E8(00000000)            	call gets
+   217 0000018A 4883C408                	add rsp, 8
+   218                                  
+   219 0000018E 48BF-                   	mov rdi, buffer					; Parametro 1: De donde voy a leer los datos. Cuando pedi un ingreso por pantalla lo guarda como un string tengo que convertirlo a un numero
+   219 00000190 [0400000000000000] 
+   220 00000198 48BE-                   	mov rsi, formatConversion		; Parametro 2: Formato de conversion
+   220 0000019A [2A03000000000000] 
+   221 000001A2 48BA-                   	mov rdx, dptoIng				; Parametro 3: Donde voy a almacenar el dato convertido
+   221 000001A4 [0E00000000000000] 
+   222 000001AC 4883EC08                	sub rsp, 8
+   223 000001B0 E8(00000000)            	call sscanf
+   224 000001B5 4883C408                	add rsp, 8
+   225                                  
+   226                                  
+   227 000001B9 48BF-                   	mov rdi, msjIngresoPrecio       ; Parametro 1: Mensaje a imprimir
+   227 000001BB [9402000000000000] 
+   228 000001C3 4883EC08                	sub rsp, 8
+   229 000001C7 E8(00000000)            	call printf
+   230 000001CC 4883C408                	add rsp, 8
+   231                                  
+   232 000001D0 48BF-                   	mov rdi, buffer					; Parametro 1: Donde voy a guardar lo ingresado
+   232 000001D2 [0400000000000000] 
+   233 000001DA 4883EC08                	sub rsp, 8
+   234 000001DE E8(00000000)            	call gets
+   235 000001E3 4883C408                	add rsp, 8
+   236                                  
+   237 000001E7 48BF-                   	mov rdi, buffer                ; Parametro 1: De donde voy a leer los datos
+   237 000001E9 [0400000000000000] 
+   238 000001F1 48BE-                   	mov rsi, formatConversion      ; Parametro 2: Formato de conversion
+   238 000001F3 [2A03000000000000] 
+   239 000001FB 48BA-                   	mov rdx, precioIng             ; Parametro 3: Donde voy a almacenar el resultado
+   239 000001FD [1200000000000000] 
+   240 00000205 4883EC08                	sub rsp, 8
+   241 00000209 E8(00000000)            	call sscanf
+   242 0000020E 4883C408                	add rsp, 8
+   243                                  
+   244                                  
+   245                                  mostrarPisos:
+   246                                  
+   247 00000212 B800000000              	mov rax, 0
+   248 00000217 48BF-                   	mov rdi, msjPrintfListado     ; Parametro 1: Mensaje a imprimir
+   248 00000219 [4002000000000000] 
+   249 00000221 4883EC08                	sub rsp, 8
+   250 00000225 E8(00000000)            	call printf
+   251 0000022A 4883C408                	add rsp, 8
+   252                                  
+   253 0000022E C70425[38030000]01-     	mov dword[pisoInicial], 1
+   253 00000236 000000             
+   254                                  
+   255                                  recorrerPisos:
+   256                                  
+   257 00000239 833C25[38030000]0C      	cmp dword[pisoInicial], 12
+   258 00000241 7F5A                    	jg  finMostrar
+   259                                  
+   260 00000243 8B0425[38030000]        	mov eax, dword[pisoInicial]	; EAX = PISO = FILA
+   261 0000024A FFC8                    	dec eax                     ; = EAX = PISO - 1
+   262                                  
+   263 0000024C 6BC004                  	imul eax, 4                 ; Multiplico por la longitud del elemento
+   264 0000024F 6BC00C                  	imul eax, 12                ; Multiplico por la cantidad de columnas
+   265                                  
+   266 00000252 89C3                    	mov ebx, eax                ; ebx = desplazamiento fila
+   267                                  
+   268 00000254 8B0425[0E000000]        	mov eax, dword[dptoIng]     ; EAX = DPTO = COL
+   269 0000025B FFC8                    	dec eax                     ; EAX = COL - 1
+   270                                  
+   271 0000025D 6BC004                  	imul eax, 4                 ; Multiplico por la longitud del elemento
+   272                                  
+   273 00000260 01C3                    	add ebx, eax                ; EBX = DESPLAZAMIENTO TOTAL
+   274                                  
+   275 00000262 678B83[00000000]        	mov eax, dword[matriz + ebx] ; muevo el precio del dpto al eax
+   276 00000269 4898                    	cdqe                         ; Lo paso a 64 bits = rax
+   277                                  
+   278 0000026B 48390425[12000000]      	cmp qword[precioIng], rax
+   279 00000273 7F1F                    	jg incrementarPiso
+   280                                  
+   281                                  
+   282 00000275 48BF-                   	mov rdi, msjMostrarPiso     ; Parametro 1: Mensaje a imprimir
+   282 00000277 [8C02000000000000] 
+   283 0000027F 488B3425[38030000]      	mov rsi, [pisoInicial]      ; Parametro 2: Piso a mostrar
+   284 00000287 4883EC08                	sub rsp, 8
+   285 0000028B E8(00000000)            	call printf
+   286 00000290 4883C408                	add rsp, 8
+   287                                  
+   288                                  
+   289                                  incrementarPiso:
+   290                                  
+   291 00000294 FF0425[38030000]        	inc dword[pisoInicial]
+   292 0000029B EB9C                    	jmp recorrerPisos
+   293                                  
+   294                                  
+   295                                  finMostrar:
+   296                                  
+   297 0000029D C3                      	ret

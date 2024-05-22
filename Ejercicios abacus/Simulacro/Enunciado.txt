@@ -1,0 +1,26 @@
+Se tiene una lista (L) cuya direccion se encuentra almacenada en la celda 200(16).
+Esta lista representa las habitaciones de un alojamiento. Cada nodo de la lista (L) está formado por 3 celdas contiguas en memoria:
+La primera contiene un número de habitacion
+La segunda contiene la cantidad de camas libres en la misma
+La ultima contiene la direccion del siguiente Nodo. El final se indica con -1 en la ultima celda del ultimo nodo.
+
+Por otro lado se tiene un vector (V) que comienza en la celda 100(16) que contiene las novedades diarias de ocupacion de camas de alojamiento.
+El vector tiene dos celdas contiguas en memoria
+La primera celda contiene un numero de habitacion del alojamiento
+La segunda celda contiene la cantidad de camas a ocupar en la habitacion. Final con -1. 
+
+Se pide realizar un programa ABACUS con punto de carga en la celda 300(16) que recorra el vector (V) y 
+actualice las camas libres ed las habitaciones del alojamiento teniendo en cuenta que tanto la lista (L) como el vector (V)
+estan ordenados por numero de habitacion y que no hay ninguna habitacion en el vector que no esté en la lista.
+
+Código de operaciones:
+
+0 – Carga inmediata      3 – Suma                      8 – Bifurcación si (AC) > 0
+
+1 – Carga              4 – Not (AC)               9 – Bifurcación si (AC) < 0
+
+2 – Almacenar     7 – Bifurcación si (AC) = 0   F – Fin de programa
+
+
+
+NOTA: Para aprobar el ejercicio debe tener correctamente resuelto el 60% del mismo.

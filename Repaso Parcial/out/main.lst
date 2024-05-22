@@ -1,0 +1,79 @@
+     1                                  global main
+     2                                  extern printf
+     3                                  extern fopen
+     4                                  extern fclose
+     5                                  extern fread
+     6                                  
+     7                                  section .data
+     8 00000000 00<rep 90h>                 matriz times 144 db 0; 12x12=144
+     9 00000090 50524543494F532E44-         filename db "PRECIOS.DAT",0
+     9 00000099 415400             
+    10 0000009C 726200                      mode db "rb",0
+    11 0000009F 4572726F7220616C20-         msgError db "Error al abrir el archivo",0
+    11 000000A8 616272697220656C20-
+    11 000000B1 6172636869766F00   
+    12                                      registro times 0 db ""
+    13                                          piso dw ""
+    14 000000B9 00                              departamento db 0
+    15 000000BA 00000000                        precio dd 0
+    16 000000BE 0000000000000000            fileHandle dq 0
+    17 000000C6 25632025692025690A-         formato db "%c %i %i",10,0
+    17 000000CF 00                 
+    18                                  
+    19                                  section .bss
+    20                                  
+    21                                  section .text
+    22                                  main:
+    23                                      ;Abro el archivo
+    24 00000000 48BF-                       mov rdi, filename
+    24 00000002 [9000000000000000] 
+    25 0000000A 48BE-                       mov rsi, mode
+    25 0000000C [9C00000000000000] 
+    26 00000014 4883EC08                    sub rsp,8
+    27 00000018 E8(00000000)                call fopen
+    28 0000001D 4883C408                    add rsp,8
+    29                                  
+    30 00000021 48890425[BE000000]          mov qword[fileHandle], rax
+    31                                  
+    32 00000029 48833C25[BE000000]-         cmp qword[fileHandle], 0
+    32 00000031 00                 
+    33 00000032 7E02                        jle errorApertura
+    34                                  
+    35 00000034 EB16                        jmp leerArchivo
+    36                                  
+    37                                  errorApertura:
+    38 00000036 B800000000                  mov rax,0
+    39 0000003B 48BF-                       mov rdi,msgError
+    39 0000003D [9F00000000000000] 
+    40 00000045 E8(00000000)                call printf
+    41                                  
+    42 0000004A EB61                        jmp fin
+    43                                  leerArchivo:
+    44 0000004C 48BF-                       mov rdi, registro; Donde voy a copiar los datos
+    44 0000004E [B900000000000000] 
+    45 00000056 BE07000000                  mov rsi, 7; Long registro
+    46 0000005B BA01000000                  mov rdx, 1; Cantidad registros
+    47 00000060 488B0C25[BE000000]          mov rcx, qword[fileHandle]; File handle
+    48 00000068 4883EC08                    sub rsp,8
+    49 0000006C E8(00000000)                call fread
+    50 00000071 4883C408                    add rsp,8
+    51                                  
+    52 00000075 4883F800                    cmp rax, 0
+    53 00000079 7E1B                        jle eof
+    54                                  
+    55                                      ;Imprimir registro
+    56 0000007B 48BF-                       mov rdi, registro
+    56 0000007D [B900000000000000] 
+    57 00000085 48BE-                       mov rsi, formato
+    57 00000087 [C600000000000000] 
+    58 0000008F E8(00000000)                call printf
+    59 00000094 EB00                        jmp eof
+    60                                  eof:
+    61 00000096 488B3C25[BE000000]          mov rdi, qword[fileHandle]
+    62 0000009E 4883EC08                    sub rsp,8
+    63 000000A2 E8(00000000)                call fclose
+    64 000000A7 4883C408                    add rsp,8
+    65                                  
+    66 000000AB EB00                        jmp fin
+    67                                  fin:
+    68 000000AD C3                          ret

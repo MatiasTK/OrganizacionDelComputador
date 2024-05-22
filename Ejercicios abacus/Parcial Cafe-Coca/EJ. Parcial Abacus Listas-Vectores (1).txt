@@ -1,0 +1,20 @@
+Abacus Ejercicio parcial.
+Se tiene una lista (L) cuya dirección de inicia se encuentra almacenada en la celda 200(16). Esta lista representa las 
+máquinas de cafe/gaseosas que provee la empresa GASACAFE SA. Cada nodo de la lista (L) está formado por 4 celdas contiguas
+en memoria:
+
+. La primera celda contiene un ID del cliente en donde está instalada la máquina 
+. La segunda celda cntiene el tipo de máquina (1 = cafe y 2 = gaseosa)
+. La tecerca celda contiene el estado de la máquina (-1 = reponer contenido, 0 = sin cambios, y 1 = maquina averiada)
+. La ultima celda contiene la direccion del siguiente nodo de la lista. El final de la lista (L) se indica con un valor
+-1 en la última celda del último nodo.
+
+- Se pide realizar un programa ABACUS con punto de carga en la celda 300 que recorra la lista (L) y genere un vector (V)
+con comienzo en la celda 100 cuyo contenido sean:
+
+Tema 1: la direccion del nodo de la lista de aquellas maquinas de cafe y cuyo estado sea el mismo que se encuentra en la celda 201(16)
+Marcar el final del vector (V) con un valor -1 en la ultima celda.
+
+Tema 2: la direccion del nodo de la lista de aquellas maquinas cuyo tipo sea el mismo que se encuentra lamacenado en la
+celda 201(16) y esten averiadas. Marcar el final del vector (V) con un valor -1 en la ultima celda.
+

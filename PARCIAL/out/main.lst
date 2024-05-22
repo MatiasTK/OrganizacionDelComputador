@@ -1,0 +1,42 @@
+     1                                  global main
+     2                                  extern puts
+     3                                  
+     4                                  section .data
+     5 00000000 464B44454A47                tabla db "FKD", "EJG"
+     6 00000006 4849514C4D4E                t1 db "HIQ", "LMN"
+     7 0000000C 4F4352414250                t2 db "OCR", "ABP"
+     8 00000012 00                          desplaz db 0
+     9 00000013 00<rep 3h>                  val1 times 3 db 0
+    10                                  
+    11                                  section .text
+    12                                  main:
+    13 00000000 BA03000000                  mov rdx,3
+    14 00000005 B901000000                  mov rcx,1
+    15                                  
+    16 0000000A 48FFCA                      dec rdx
+    17 0000000D 486BD206                    imul rdx,6
+    18                                  
+    19 00000011 4883E901                    sub rcx,1
+    20 00000015 486BC902                    imul rcx,2
+    21                                  
+    22 00000019 4801CA                      add rdx,rcx
+    23 0000001C 488D0425[00000000]          lea rax, [tabla]
+    24 00000024 4801D0                      add rax,rdx
+    25                                  
+    26 00000027 4883EA0A                    sub rdx,10
+    27 0000002B 4889D1                      mov rcx,rdx
+    28                                  
+    29 0000002E 4889C6                      mov rsi,rax
+    30 00000031 48BF-                       mov rdi,val1
+    30 00000033 [1300000000000000] 
+    31 0000003B F3A4                        rep movsb
+    32                                  
+    33 0000003D 48BF-                       mov rdi,val1
+    33 0000003F [1300000000000000] 
+    34 00000047 4883EC08                    sub rsp,8
+    35 0000004B E8(00000000)                call puts
+    36 00000050 4883C408                    add rsp,8
+    37                                  
+    38 00000054 4829C0                      sub rax,rax
+    39 00000057 668B0425[0A000000]          mov ax, [t1+4]
+    40 0000005F C3                          ret

@@ -1,0 +1,149 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Create output folder",
+        "type": "shell",
+        "command": "mkdir",
+        "args": [
+          "-p",
+          "${fileDirname}/out"
+        ],
+       "presentation": {
+          "focus": true,
+          "panel": "dedicated",
+          "reveal": "silent",
+          "clear": true,
+          "close": true,
+        }
+      },
+      {
+        "label": "nasm",
+        "type": "shell",
+        "command": "nasm",
+        "args": [
+          "-F",
+          "dwarf",
+          "-g",
+          "-f",
+          "elf64",
+          "-l",
+          "${fileDirname}/out/${fileBasenameNoExtension}.lst",
+          "-o",
+          "${fileDirname}/out/${fileBasenameNoExtension}.o",
+          "${file}"
+        ],
+        "dependsOn": "Create output folder",
+        "problemMatcher": {
+          "owner": "nasm",
+          "fileLocation": ["absolute"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):\\s+(error|warning):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          }
+        },
+        "presentation": {
+          "focus": true,
+          "panel": "dedicated",
+          "reveal": "silent",
+          "clear": true,
+          "close": true,
+        }
+      },
+      {
+        "label": "gcc",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-no-pie",
+          "-o",
+          "${fileDirname}/out/${fileBasenameNoExtension}",
+          "${fileDirname}/out/${fileBasenameNoExtension}.o",
+        ],
+        "dependsOn": "nasm",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": {
+          "owner": "gcc",
+          "fileLocation": ["absolute"],
+          "pattern": {
+            "regexp": "(.*):(.*):\\s(error|warning):\\s(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          },
+        },
+        "presentation": {
+          "focus": true,
+          "panel": "dedicated",
+          "reveal": "silent",
+          "clear": true,
+          "close": true,
+        }
+      },
+      {
+        "label": "nasm folder",
+        "type": "shell",
+        "command": "for file in ${fileDirname}/*.asm; do nasm -F dwarf -g -f elf64 -l ${fileDirname}/out/$(basename $file .asm).lst -o ${fileDirname}/out/$(basename $file .asm).o $file; done",
+        "dependsOn": "Create output folder",
+        "problemMatcher": {
+          "owner": "nasm",
+          "fileLocation": ["absolute"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):\\s+(error|warning):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          }
+        },
+        "presentation": {
+          "focus": true,
+          "panel": "dedicated",
+          "reveal": "silent",
+          "clear": true,
+          "close": true,
+        }
+      },
+      {
+        "label": "gcc folder",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-no-pie",
+          "-o",
+          "${fileDirname}/out/${fileBasenameNoExtension}",
+          "${fileDirname}/out/*.o",
+        ],
+        "dependsOn": "nasm folder",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": {
+          "owner": "gcc",
+          "fileLocation": ["absolute"],
+          "pattern": {
+            "regexp": "(.*):(.*):\\s(error|warning):\\s(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          },
+        },
+        "presentation": {
+          "focus": true,
+          "panel": "dedicated",
+          "reveal": "silent",
+          "clear": true,
+          "close": true,
+        }
+      }
+    ]
+}

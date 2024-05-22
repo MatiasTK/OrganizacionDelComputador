@@ -1,0 +1,55 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "asm64+gcc",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}/out/${fileBasenameNoExtension}",
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerArgs": "-q -ex quit; wait() { fg >/dev/null; }; /bin/gdb -q --interpreter=mi",
+      "launchCompleteCommand": "exec-run",
+      "preLaunchTask": "gcc",
+      "setupCommands": [
+          {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": false
+          },
+          {
+            "description": "Set disassembly-flavor intel",
+            "text": "set disassembly-flavor intel",
+            "ignoreFailures": false
+          }
+      ],
+    },
+    {
+      "name": "asm64+gcc folder",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}/out/${fileBasenameNoExtension}",
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerArgs": "-q -ex quit; wait() { fg >/dev/null; }; /bin/gdb -q --interpreter=mi",
+      "launchCompleteCommand": "exec-run",
+      "preLaunchTask": "gcc folder",
+      "setupCommands": [
+          {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": false
+          },
+          {
+            "description": "Set disassembly-flavor intel",
+            "text": "set disassembly-flavor intel",
+            "ignoreFailures": false
+          }
+      ],
+    }
+  ]
+}

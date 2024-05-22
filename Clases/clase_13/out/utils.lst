@@ -1,0 +1,13 @@
+     1                                  global strlen
+     2                                  
+     3                                  section .text
+     4                                  ; Voy a asumir que en rdi esta la dir de inicio de string.
+     5                                  strlen:
+     6 00000000 B800000000                  mov rax,0
+     7                                  nextChar:
+     8 00000005 803C0700                    cmp byte[rdi+rax],0
+     9 00000009 7405                        je endstrlen
+    10 0000000B 48FFC0                      inc rax
+    11 0000000E EBF5                        jmp nextChar
+    12                                  endstrlen:
+    13 00000010 C3                      ret

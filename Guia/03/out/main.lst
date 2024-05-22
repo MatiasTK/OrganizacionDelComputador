@@ -1,0 +1,116 @@
+     1                                  %macro mPrintf 0
+     2                                      sub rsp, 8
+     3                                      call printf
+     4                                      add rsp, 8
+     5                                  %endmacro
+     6                                  
+     7                                  %macro mGets 0
+     8                                      sub rsp, 8
+     9                                      call gets
+    10                                      add rsp, 8
+    11                                  %endmacro
+    12                                  
+    13                                  %macro mSscanf 0
+    14                                      sub rsp, 8
+    15                                      call sscanf
+    16                                      add rsp, 8
+    17                                  %endmacro
+    18                                  
+    19                                  global main
+    20                                  
+    21                                  extern printf
+    22                                  extern gets
+    23                                  extern sscanf
+    24                                  
+    25                                  section .data
+    26 00000000 44696769746520756E-         msgNumero db "Digite un numero: ", 0
+    26 00000009 206E756D65726F3A20-
+    26 00000012 00                 
+    27 00000013 446967697465206C61-         msgPotencia db "Digite la potencia a la que desea elevar el numero: ", 0
+    27 0000001C 20706F74656E636961-
+    27 00000025 2061206C6120717565-
+    27 0000002E 20646573656120656C-
+    27 00000037 6576617220656C206E-
+    27 00000040 756D65726F3A2000   
+    28 00000048 456C20726573756C74-         msgResultado db "El resultado es %d", 10,0
+    28 00000051 61646F206573202564-
+    28 0000005A 0A00               
+    29 0000005C 20256400                    nFormat db " %d", 0
+    30                                  
+    31                                  section .bss
+    32 00000000 <res 64h>                   buffer resb 100
+    33 00000064 <res 190h>                  numero resd 100
+    34 000001F4 <res 190h>                  potencia resd 100
+    35 00000384 <res 190h>                  resultado resd 100
+    36                                  
+    37                                  section .text
+    38                                  main:
+    39 00000000 48BF-                       mov rdi, msgNumero
+    39 00000002 [0000000000000000] 
+    40                                      mPrintf
+     2 0000000A 4883EC08            <1>  sub rsp, 8
+     3 0000000E E8(00000000)        <1>  call printf
+     4 00000013 4883C408            <1>  add rsp, 8
+    41 00000017 48BF-                       mov rdi, buffer
+    41 00000019 [0000000000000000] 
+    42                                      mGets
+     8 00000021 4883EC08            <1>  sub rsp, 8
+     9 00000025 E8(00000000)        <1>  call gets
+    10 0000002A 4883C408            <1>  add rsp, 8
+    43                                  
+    44 0000002E 48BF-                       mov rdi, buffer
+    44 00000030 [0000000000000000] 
+    45 00000038 48BE-                       mov rsi, nFormat
+    45 0000003A [5C00000000000000] 
+    46 00000042 48BA-                       mov rdx, numero
+    46 00000044 [6400000000000000] 
+    47                                      mSscanf
+    14 0000004C 4883EC08            <1>  sub rsp, 8
+    15 00000050 E8(00000000)        <1>  call sscanf
+    16 00000055 4883C408            <1>  add rsp, 8
+    48                                  
+    49 00000059 48BF-                       mov rdi, msgPotencia
+    49 0000005B [1300000000000000] 
+    50                                      mPrintf
+     2 00000063 4883EC08            <1>  sub rsp, 8
+     3 00000067 E8(00000000)        <1>  call printf
+     4 0000006C 4883C408            <1>  add rsp, 8
+    51 00000070 48BF-                       mov rdi, buffer
+    51 00000072 [0000000000000000] 
+    52                                      mGets
+     8 0000007A 4883EC08            <1>  sub rsp, 8
+     9 0000007E E8(00000000)        <1>  call gets
+    10 00000083 4883C408            <1>  add rsp, 8
+    53                                  
+    54 00000087 48BF-                       mov rdi, buffer
+    54 00000089 [0000000000000000] 
+    55 00000091 48BE-                       mov rsi, nFormat
+    55 00000093 [5C00000000000000] 
+    56 0000009B 48BA-                       mov rdx, potencia
+    56 0000009D [F401000000000000] 
+    57                                      mSscanf
+    14 000000A5 4883EC08            <1>  sub rsp, 8
+    15 000000A9 E8(00000000)        <1>  call sscanf
+    16 000000AE 4883C408            <1>  add rsp, 8
+    58                                  
+    59 000000B2 8B0425[64000000]            mov eax, dword[numero]
+    60 000000B9 890425[84030000]            mov dword[resultado], eax
+    61                                  aplicarPotencia:
+    62 000000C0 833C25[F4010000]01          cmp dword[potencia], 1
+    63 000000C8 7420                        je exit
+    64 000000CA 8B0425[64000000]            mov eax, dword[numero]
+    65 000000D1 8B1C25[84030000]            mov ebx, dword[resultado]
+    66 000000D8 F7E3                        mul ebx
+    67 000000DA 890425[84030000]            mov dword[resultado], eax
+    68 000000E1 FF0C25[F4010000]            dec dword[potencia]
+    69 000000E8 EBD6                        jmp aplicarPotencia
+    70                                  exit:
+    71 000000EA 48BF-                       mov rdi, msgResultado
+    71 000000EC [4800000000000000] 
+    72 000000F4 488B3425[84030000]          mov rsi, [resultado]
+    73                                      mPrintf
+     2 000000FC 4883EC08            <1>  sub rsp, 8
+     3 00000100 E8(00000000)        <1>  call printf
+     4 00000105 4883C408            <1>  add rsp, 8
+    74                                  
+    75 00000109 C3                          ret

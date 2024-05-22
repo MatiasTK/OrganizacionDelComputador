@@ -1,0 +1,17 @@
+Se tiene una lista (L) cuya dirección de inicio se encuentra almacenada en la celda 200(16). Esta lista representa los cursos de un instituto. Cada nodo de la lista (L) está formado por 3 celdas contiguas en memoria: 
+
+*    La primera contiene un número de curso.
+
+*    La segunda contiene la cantidad de inscriptos al curso.
+
+*    La última contiene la dirección del siguiente nodo de la lista.
+
+El final de la lista (L) se indica con un valor -1 en la última celda del último nodo.
+Por otro lado se tiene un vector (V) que comienza en la celda 100(16) que contiene las novedades semanales de bajas del curso. El vector tiene dos celdas contiguas en memoria:
+
+*    La primera celda contiene un número de curso.
+
+*    La segunda celda contiene la cantidad de bajas del curso.
+
+El final del vector se representa con un -1 en la primera celda.
+Se pide realizar un programa ABACUS con punto de carga en la celda 300(16) que recorra el vector (V) y actualice la cantidad de inscriptos al curso, teniendo en cuenta que tanto la lista (L) como el vector (V) están ordenados por número de curso y que no hay ningún curso en el vector (V) que no esté en la lista.

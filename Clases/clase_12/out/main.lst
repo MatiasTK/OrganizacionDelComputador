@@ -1,0 +1,181 @@
+     1                                  ;*****************************************************************************
+     2                                  ; sumatriz.asm
+     3                                  ; Dada una matriz de 5x5 cuyos elementos son números enteros de 2 bytes (word)
+     4                                  ; se pide solicitar por teclado un nro de fila y columna y realizar
+     5                                  ; la sumatoria de los elementos de la fila elegida a partir de la
+     6                                  ; columan elegida y mostrar el resultado por pantalla.
+     7                                  ; Se deberá validar mediante una rutina interna que los datos ingresados por
+     8                                  ; teclado sean validos.
+     9                                  ;
+    10                                  ;*****************************************************************************
+    11                                  
+    12                                  global	main
+    13                                  extern	printf
+    14                                  extern	gets
+    15                                  extern	sscanf
+    16                                  extern	puts
+    17                                  
+    18                                  section	.data
+    19                                  
+    20                                      ;matriz  dw  1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5
+    21 00000000 010001000100010001-         matriz  dw 1,1,1,1,1
+    21 00000009 00                 
+    22 0000000A 020002000200020002-                 dw 2,2,2,2,2
+    22 00000013 00                 
+    23 00000014 030003000300030003-                 dw 3,3,3,3,3
+    23 0000001D 00                 
+    24 0000001E 040004000400040004-                 dw 4,4,4,4,4
+    24 00000027 00                 
+    25 00000028 050005000500050005-                 dw 5,5,5,5,5
+    25 00000031 00                 
+    26 00000032 496E67726573652066-         msjIngFilCol	db	"Ingrese fila (1 a 5) y columna (1 a 5) separados por un espacio: ",0
+    26 0000003B 696C61202831206120-
+    26 00000044 3529207920636F6C75-
+    26 0000004D 6D6E61202831206120-
+    26 00000056 352920736570617261-
+    26 0000005F 646F7320706F722075-
+    26 00000068 6E206573706163696F-
+    26 00000071 3A2000             
+    27 00000074 2568692025686900            formatInputFilCol	db	"%hi %hi",0
+    28 0000007C 4C6F73206461746F73-         msjErrorInput       db  "Los datos ingresados son inválidos.  Intente nuevamente."
+    28 00000085 20696E677265736164-
+    28 0000008E 6F7320736F6E20696E-
+    28 00000097 76C3A16C69646F732E-
+    28 000000A0 2020496E74656E7465-
+    28 000000A9 206E756576616D656E-
+    28 000000B2 74652E             
+    29 000000B5 00000000                	sumatoria		dd 0
+    30 000000B9 4C612073756D61746F-     	msjSumatoria	db	"La sumatoria es: %i",10,0
+    30 000000C2 7269612065733A2025-
+    30 000000CB 690A00             
+    31                                  
+    32                                  section	.bss
+    33 00000000 <res 32h>               	inputFilCol		resb	50
+    34 00000032 ????                       	fila			resw	1
+    35 00000034 ????                    	columna			resw	1
+    36 00000036 ??                          inputValido     resb    1   ;S valido N invalido
+    37 00000037 ????                        desplaz			resw	1
+    38                                  
+    39                                  section	.text
+    40                                  main:
+    41 00000000 48BF-                       mov		rdi,msjIngFilCol
+    41 00000002 [3200000000000000] 
+    42 0000000A 4883EC08                    sub		rsp,8
+    43 0000000E E8(00000000)                call	printf
+    44 00000013 4883C408                    add		rsp,8
+    45                                  
+    46 00000017 48BF-                       mov		rdi,inputFilCol
+    46 00000019 [0000000000000000] 
+    47 00000021 4883EC08                	sub		rsp,8
+    48 00000025 E8(00000000)                call    gets
+    49 0000002A 4883C408                	add		rsp,8
+    50                                  
+    51 0000002E 4883EC08                    sub     rsp,8
+    52 00000032 E856000000                  call    validarFyC
+    53 00000037 4883C408                    add     rsp,8
+    54                                  
+    55 0000003B 803C25[36000000]53          cmp     byte[inputValido],'S'
+    56 00000043 7419                        je      continuar
+    57                                  
+    58 00000045 48BF-                       mov     rdi,msjErrorInput
+    58 00000047 [7C00000000000000] 
+    59 0000004F 4883EC08                    sub     rsp,8
+    60 00000053 E8(00000000)                call    puts
+    61 00000058 4883C408                    add     rsp,8
+    62                                  
+    63 0000005C EBA2                        jmp     main
+    64                                  continuar:
+    65                                  ; sumatoria
+    66 0000005E 4883EC08                	sub		rsp,8
+    67 00000062 E8CE000000                  call	calcSumatoria
+    68 00000067 4883C408                	add		rsp,8
+    69                                  
+    70                                  ;mostar por pantalla
+    71 0000006B 48BF-                       mov		rdi,msjSumatoria
+    71 0000006D [B900000000000000] 
+    72 00000075 4829F6                  	sub		rsi,rsi
+    73 00000078 8B3425[B5000000]        	mov		esi,[sumatoria]
+    74 0000007F 4883EC08                	sub		rsp,8
+    75 00000083 E8(00000000)            	call	printf
+    76 00000088 4883C408                	add		rsp,8
+    77                                  
+    78                                  
+    79 0000008C C3                      ret ;FIN DE PROGRAMA
+    80                                  ;*********************************
+    81                                  ; RUTINAS INTERNAS
+    82                                  ;*********************************
+    83                                  validarFyC:
+    84 0000008D C60425[36000000]4E          mov     byte[inputValido],'N'
+    85                                  
+    86 00000095 48BF-                       mov     rdi,inputFilCol
+    86 00000097 [0000000000000000] 
+    87 0000009F 48BE-                       mov     rsi,formatInputFilCol
+    87 000000A1 [7400000000000000] 
+    88 000000A9 48BA-                       mov     rdx,fila
+    88 000000AB [3200000000000000] 
+    89 000000B3 48B9-                       mov     rcx,columna
+    89 000000B5 [3400000000000000] 
+    90 000000BD 4883EC08                	sub		rsp,8
+    91 000000C1 E8(00000000)            	call	sscanf
+    92 000000C6 4883C408                	add		rsp,8
+    93                                  
+    94 000000CA 4883F802                    cmp     rax,2
+    95 000000CE 7C34                        jl      invalido
+    96                                  
+    97 000000D0 66833C25[32000000]-         cmp     word[fila],1
+    97 000000D8 01                 
+    98 000000D9 7C29                        jl      invalido
+    99 000000DB 66833C25[32000000]-         cmp     word[fila],5
+    99 000000E3 05                 
+   100 000000E4 7F1E                        jg      invalido
+   101                                  
+   102 000000E6 66833C25[34000000]-         cmp     word[columna],1
+   102 000000EE 01                 
+   103 000000EF 7C13                        jl      invalido
+   104 000000F1 66833C25[34000000]-         cmp     word[columna],5
+   104 000000F9 05                 
+   105 000000FA 7F08                        jg      invalido
+   106                                  
+   107 000000FC C60425[36000000]53          mov     byte[inputValido],'S'
+   108                                  invalido:
+   109 00000104 C3                      ret
+   110                                  ;*********************************
+   111                                  calcDesplaz:
+   112                                  ;  [(fila-1)*longFila]  + [(columna-1)*longElemento]
+   113                                  ;  longFila = longElemento * cantidad columnas
+   114 00000105 668B1C25[32000000]          mov     bx,[fila]
+   115 0000010D 6683EB01                    sub     bx,1
+   116 00000111 666BDB0A                    imul    bx,bx,10    ;en bx tengo el desplazamiento a la fila, Como hay 5 elementos de 2 bytes 5*2=10
+   117                                  
+   118 00000115 66891C25[37000000]          mov     [desplaz],bx
+   119                                  
+   120 0000011D 668B1C25[34000000]          mov     bx,[columna]
+   121 00000125 66FFCB                      dec     bx
+   122 00000128 666BDB02                    imul    bx,bx,2; Valor de cada elemento 2 bytes
+   123                                  
+   124 0000012C 66011C25[37000000]          add     [desplaz],bx    ;en desplaz tengo el desplazamiento total
+   125 00000134 C3                      ret
+   126                                  
+   127                                  ;*********************************
+   128                                  calcSumatoria:
+   129 00000135 4883EC08                	sub		rsp,8
+   130 00000139 E8C7FFFFFF                  call	calcDesplaz
+   131 0000013E 4883C408                	add		rsp,8
+   132                                  ;jmp FIN_NO_OLVIDAR_REMOVER
+   133 00000142 B906000000                  mov     rcx,6
+   134 00000147 662B0C25[34000000]          sub     cx,[columna]
+   135 0000014F 8B1C25[37000000]            mov     ebx,[desplaz]
+   136                                  sumarSiguiente:
+   137 00000156 29C0                        sub     eax,eax ;limpio el registro eax
+   138 00000158 66678B83[00000000]          mov     ax,[matriz + ebx]   ; cargo el elemento de la matriz q es de 2 bytes
+   139 00000160 010425[B5000000]            add     [sumatoria],eax     ;actualizo la sumatoria con un campo de 4 bytes
+   140 00000167 83C302                      add     ebx,2
+   141 0000016A E2EA                        loop    sumarSiguiente
+   142                                  FIN_NO_OLVIDAR_REMOVER:
+   143 0000016C C3                      ret
+   144                                  
+   145                                  
+   146                                  
+   147                                  
+   148                                  
+   149                                  
