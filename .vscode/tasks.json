@@ -142,7 +142,7 @@
           "panel": "dedicated",
           "reveal": "silent",
           "clear": true,
-          "close": true,
+          "close": false,
         }
       }
     ]
