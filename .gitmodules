@@ -1,0 +1,3 @@
+[submodule "TRABAJO_PRACTICO"]
+	path = TRABAJO_PRACTICO
+	url = git@github.com:MatiasTK/OrganizacionDelComputador-TrabajoPractico.git
